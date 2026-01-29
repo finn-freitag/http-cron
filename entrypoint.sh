@@ -62,4 +62,4 @@ echo "Starting crond with the following config:"
 cat "$CRON_FILE"
 
 # -f: foreground, -L /dev/stdout: log to stdout so you see it in docker logs
-exec crond -f -L /dev/stdout
+exec crond -f -L /dev/stdout -l 8 2>&1 | grep -v "crond: USER root"
