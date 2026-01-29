@@ -17,7 +17,7 @@ services:
         restart:
             unless-stopped
 ```
-The CRON_JOB_X_SCHEDULE environment variable uses [cron syntax](https://www.netiq.com/documentation/cloud-manager-2-5/ncm-reference/data/bexyssf.html). The CRON_JOB_X_URL is the URL your want to request. There could be as many cron jobs as you want, each with an increasing integer number starting at 1.
+The CRON_JOB_X_SCHEDULE environment variable uses [cron syntax](https://www.netiq.com/documentation/cloud-manager-2-5/ncm-reference/data/bexyssf.html). The CRON_JOB_X_URL is the URL you want to request. There could be as many cron jobs as you want, each with an increasing integer number starting at 1.
 
 Start the docker container:
 ```
