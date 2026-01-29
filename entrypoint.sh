@@ -9,6 +9,8 @@ mkdir -p /etc/crontabs
 
 # Capture the global fallback schedule
 GLOBAL_SCHEDULE="${CRON_JOB_SCHEDULE:-}"
+MAX_RETRIES="${CRON_JOB_MAX_RETRIES:-3}"
+TIMEOUT="${CRON_JOB_TIMEOUT:-10}"
 
 job_found=false
 i=1
@@ -16,6 +18,8 @@ i=1
 while :; do
     # Using 'eval' to get the dynamic variable names
     spec_schedule=$(eval "echo \${CRON_JOB_${i}_SCHEDULE:-}")
+    spec_max_retries=$(eval "echo \${CRON_JOB_${i}_MAX_RETRIES:-}")
+    spec_timeout=$(eval "echo \${CRON_JOB_${i}_TIMEOUT:-}")
     url=$(eval "echo \${CRON_JOB_${i}_URL:-}")
 
     if [ -z "$url" ]; then
@@ -25,6 +29,8 @@ while :; do
     # Determine which schedule to use: Specific > Global
     # If both are empty, we have a URL but no way to know when to run it
     final_schedule="${spec_schedule:-$GLOBAL_SCHEDULE}"
+    final_max_retries="${spec_max_retries:-$MAX_RETRIES}"
+    final_timeout="${spec_timeout:-$TIMEOUT}"
 
     if [ -z "$final_schedule" ]; then
         echo "ERROR: No schedule found for CRON_JOB_${i}_URL. Set CRON_JOB_${i}_SCHEDULE or a global CRON_JOB_SCHEDULE." >&2
@@ -32,7 +38,7 @@ while :; do
     fi
 
     # Write the job to the crontab
-    echo "$final_schedule echo \"[\$(date)] calling $url\" && curl -fsS --max-time 10 --retry 3 $url" >> "$CRON_FILE"
+    echo "$final_schedule echo \"[\$(date)] calling $url\" && curl -fsS --max-time $final_timeout --retry $final_max_retries $url" >> "$CRON_FILE"
     
     job_found=true
     i=$((i + 1))
