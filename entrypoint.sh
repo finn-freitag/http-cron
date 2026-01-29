@@ -7,25 +7,32 @@ CRON_FILE="/etc/crontabs/root"
 mkdir -p /etc/crontabs
 : > "$CRON_FILE"
 
+# Capture the global fallback schedule
+GLOBAL_SCHEDULE="${CRON_JOB_SCHEDULE:-}"
+
 job_found=false
 i=1
 
 while :; do
     # Using 'eval' to get the dynamic variable names
-    schedule=$(eval "echo \${CRON_JOB_${i}_SCHEDULE:-}")
+    spec_schedule=$(eval "echo \${CRON_JOB_${i}_SCHEDULE:-}")
     url=$(eval "echo \${CRON_JOB_${i}_URL:-}")
 
-    if [ -z "$schedule" ] && [ -z "$url" ]; then
+    if [ -z "$url" ]; then
         break
     fi
 
-    if [ -z "$schedule" ] || [ -z "$url" ]; then
-        echo "ERROR: CRON_JOB_${i}_SCHEDULE and CRON_JOB_${i}_URL must both be set" >&2
+    # Determine which schedule to use: Specific > Global
+    # If both are empty, we have a URL but no way to know when to run it
+    final_schedule="${spec_schedule:-$GLOBAL_SCHEDULE}"
+
+    if [ -z "$final_schedule" ]; then
+        echo "ERROR: No schedule found for CRON_JOB_${i}_URL. Set CRON_JOB_${i}_SCHEDULE or a global CRON_JOB_SCHEDULE." >&2
         exit 1
     fi
 
     # Write the job to the crontab
-    echo "$schedule echo \"[\$(date)] calling $url\" && curl -fsS --max-time 10 --retry 3 $url" >> "$CRON_FILE"
+    echo "$final_schedule echo \"[\$(date)] calling $url\" && curl -fsS --max-time 10 --retry 3 $url" >> "$CRON_FILE"
     
     job_found=true
     i=$((i + 1))
