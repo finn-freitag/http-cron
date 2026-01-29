@@ -1,5 +1,6 @@
 #!/bin/sh
 set -eu
+set -f
 
 CRON_FILE="/etc/crontabs/root"
 # Ensure the directory exists and the file is fresh
