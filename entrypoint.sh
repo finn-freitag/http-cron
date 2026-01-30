@@ -39,9 +39,9 @@ while :; do
 
     # No check vor valid value of final_max_retries nd final_timeout, because they have default values
 	
-	cmd="{ printf \"[\$(date)] calling %-50s \" \"$url\"; code=\$(curl -s -o /dev/null -w \"%{http_code}\" --max-time $final_timeout --retry $final_max_retries \"$url\"); echo \"status: \$code\"; }"
+	cmd="MSG=\$(printf \"[\$(date)] calling %-50s \" \"$url\") && CODE=\$(curl -s -o /dev/null -w \"%{http_code}\" --max-time $final_timeout --retry $final_max_retries \"$url\") && echo \"\$MSG status: \$CODE\""
 
-    echo "$final_schedule $cmd" >> "$CRON_FILE"
+    echo "$final_schedule sh -c '$cmd'" >> "$CRON_FILE"
     
     job_found=true
     i=$((i + 1))
