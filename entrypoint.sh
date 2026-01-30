@@ -42,9 +42,6 @@ while :; do
 	cmd="printf \"[\$(date)] calling $url \" && code=\$(curl -s -o /dev/null -w \"%{http_code}\" --max-time $final_timeout --retry $final_max_retries \"$url\") && echo \"responding with \$code\""
 
     echo "$final_schedule $cmd" >> "$CRON_FILE"
-
-    # Write the job to the crontab
-    echo "$final_schedule echo \"[\$(date)] calling $url\" && curl -fsS --max-time $final_timeout --retry $final_max_retries $url" >> "$CRON_FILE"
     
     job_found=true
     i=$((i + 1))
