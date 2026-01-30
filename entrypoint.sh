@@ -37,7 +37,7 @@ while :; do
         exit 1
     fi
 
-    # No check vor valid value of final_max_retries nd final_timeout, because they have default values
+    # No check for valid value of final_max_retries nd final_timeout, because they have default values
 	
 	cmd="MSG=\$(printf \"[\$(date)] calling %-50s \" \"$url\") && CODE=\$(curl -s -o /dev/null -w \"%{http_code}\" --max-time $final_timeout --retry $final_max_retries \"$url\") && echo \"\$MSG status: \$CODE\""
 
